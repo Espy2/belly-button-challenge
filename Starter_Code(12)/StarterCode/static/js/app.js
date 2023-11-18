@@ -102,31 +102,31 @@ function populateDropdownWithD3() {
 
 function fColor(y){
     if (y > 2000) {
-      return "yellow"
+      return "Coral"
     }
     else if (y > 1750){
-      return "gold"
+      return "Emerald Green"
     } 
     else if (y > 1500){
-      return "green"
+      return "Gold"
     }
     else if (y > 1250){
-        return "cyan"
+        return "Dodger Blue"
       }
     else if (y > 1000){
-        return "blue"
+        return "Turquoise"
       }
     else if (y > 750){
-        return "teal"
+        return "Alizarin Crimson"
       }
     else if (y > 500){
-        return "pink"
+        return "Nephritis Green"
       }
     else if (y > 250){
         return "orange"
       }
     else if (y > 50){
-        return "red"
+        return "Dodger Blue"
       }
     else { return "black"}
   }
