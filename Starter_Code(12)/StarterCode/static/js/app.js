@@ -11,13 +11,21 @@ let bubbleSv = []
 let bubbleIds = []
 
 let meta = []
+let dropdownNames = [];
 
 function processData(data) {
   const { metadata, names, samples } = data;
 
   metadata.forEach(demographic => meta.push(demographic));
 
-  names.forEach(dataName => names.push(dataName));
+  dropdownNames = []; // Clear dropdownNames before updating it
+
+  names.forEach(dataName => {
+      dropdownNames.push(dataName);
+  });
+
+
+
 
   samples.forEach(sample => {
       const id = sample.id;
@@ -55,34 +63,24 @@ d3.select("#selDataset").on("change", function() {
 
 
 function optionChanged(selectedId) {
-    const index = names.indexOf(selectedId);
-        updatePlotly(sV[index], iDs[index]);
-        updateBubble(bubbleIds[index], bubbleSv[index]);
-        updateDemo(meta[index]);
-        updateGauge(meta[index]["wfreq"])
+  const index = dropdownNames.indexOf(selectedId);
+  updatePlotly(sV[index], iDs[index]);
+  updateBubble(bubbleIds[index], bubbleSv[index]);
+  updateDemo(meta[index]);
+  updateGauge(meta[index]["wfreq"]);
 }
 
+
 function populateDropdownWithD3() {
-    const dropdown = d3.select("#selDataset");
+  const dropdown = d3.select("#selDataset");
 
-    // Bind names to dropdown
-    dropdown.selectAll("option")
-        // tying names list to this dropdown
-        .data(names)
-
-        // focus on any name in the names list that isn't already in the dropdown (in this case all the names)
-        .enter()
-
-        //how each name appears as a selectable option in our dropdown
-        .append("option")
-
-        //make the displayed text of this option be the name
-        .text(d => d)
-
-        //the option displayed will also be the value in the background
-        .attr("value", d => d)
-    
-
+  // Bind dropdownNames to dropdown (corrected variable name)
+  dropdown.selectAll("option")
+      .data(dropdownNames)  // Use correct variable here
+      .enter()
+      .append("option")
+      .text(d => d)
+      .attr("value", d => d);
 }
 
 function fColor(y){
@@ -188,27 +186,33 @@ function updatePlotly(x, y) {
     Plotly.newPlot("bar", plotdata);
 }
 
-function updateBubble(id,sv){
-    var trace1 = [{
-        x: id,
-        y: sv,
-        mode: 'markers', 
-        marker: {
-            color: id.map(val => fColor(val)),
-            opacity: id.map(val => fOp(val)),
-            size: sv.map(val => val)
-        }
+function updateBubble(id, sv) {
+  if (!id || !sv) {
+      console.error("Invalid data provided to updateBubble function");
+      return;
+  }
+
+  var trace1 = [{
+      x: id,
+      y: sv,
+      mode: 'markers', 
+      marker: {
+          color: id.map(val => fColor(val)),
+          opacity: id.map(val => fOp(val)),
+          size: sv.map(val => val)
+      }
   }];
 
   var layout = {
-    //title: 'Marker Size and Color',
-    showlegend: false,
-    height: 600,
-    width: 1000
+      //title: 'Marker Size and Color',
+      showlegend: false,
+      height: 600,
+      width: 1000
   };
-  
+
   Plotly.newPlot("bubble", trace1, layout);
-};
+}
+
 
 
 console.log('Sample Values:', sV);
