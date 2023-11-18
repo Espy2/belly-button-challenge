@@ -12,54 +12,39 @@ let bubbleIds = []
 
 let meta = []
 
-d3.json(url).then((data) => {
-    for (let i=0; i < data["metadata"].length; i++){
-        demographic = data["metadata"][i]
-        meta.push(demographic)
-    }
+function processData(data) {
+  const { metadata, names, samples } = data;
 
-    for (let i=0; i < data["names"].length; i++){
-        dataNames = data["names"][i]
-        names.push(dataNames)
-    }
+  metadata.forEach(demographic => meta.push(demographic));
 
-    for (let i=0; i < data["names"].length; i++){
-    
-        id = data["samples"][i]["id"]
-    
-        let sampleV = data["samples"][i]["sample_values"];
-        bubbleSv.push(sampleV)
+  names.forEach(dataName => names.push(dataName));
 
-        let otuIds = data["samples"][i]["otu_ids"];
-        bubbleIds.push(otuIds)
+  samples.forEach(sample => {
+      const id = sample.id;
+      const sampleV = sample.sample_values.slice(0, 10).reverse();
+      const otuIds = sample.otu_ids.slice(0, 10).map(item => "OTU " + item).reverse();
+      const outL = sample.otu_labels.slice(0, 10);
+      
+      sV.push(sampleV);
+      iDs.push(otuIds);
+      oLabels.push(outL);
+      
+      bubbleIds.push(sample.otu_ids);
+      bubbleSv.push(sample.sample_values);
+  });
 
-        let outL = data["samples"][i]["otu_labels"];
-    
-        let extractedSampleV = sampleV.slice(0,10);
-        let sortSampleV = extractedSampleV.reverse()
-        sV.push(sortSampleV)
+  populateDropdownWithD3();
+  init();
+  initTwo();
+  initDemo();
+  initGauge();
+}
 
-        let extractedotuIds = otuIds.slice(0,10);
-        let formattedIds = extractedotuIds.map(item => "OTU " + item).reverse()
-        iDs.push(formattedIds);
-
-        let extractedoutL = outL.slice(0,10);
-        oLabels.push(extractedoutL);
-
-
-    populateDropdownWithD3();
-    
-    init();
-
-    initTwo();
-
-    initDemo();
-
-    initGauge();
-
-}}).catch(error => {
-    console.error("An error occurred:", error);
-});
+d3.json(url)
+  .then(processData)
+  .catch(error => {
+      console.error("An error occurred:", error);
+  });
 
 // event listener: when user picks a different name, it will trigger the optionChanged funciton
 d3.select("#selDataset").on("change", function() {
